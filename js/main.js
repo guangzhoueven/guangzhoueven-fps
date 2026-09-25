@@ -7,6 +7,61 @@ let phase = 'menu';
 let grenadesArr = []; // alias
 let _lastHudT = 0, _lastMmT = 0;
 
+function setPhase(p){
+  phase = p;
+  document.body.classList.toggle('phase-menu', p === 'menu');
+  document.body.classList.toggle('phase-playing', p === 'playing');
+  document.body.classList.toggle('phase-paused', p === 'paused');
+}
+function uiOverlayOpen(){
+  if(state.gameOver || state.inShop) return true;
+  const perks = document.getElementById('perks');
+  const shop = document.getElementById('shop');
+  return (perks && perks.style.display === 'flex') || (shop && shop.style.display === 'flex');
+}
+let _wasLocked = false, _lockRetry = 0;
+function requestGameLock(){
+  if(phase !== 'playing') return;
+  if(document.pointerLockElement === canvas){ _lockRetry = 0; return; }
+  const onFail = ()=>{
+    if(phase !== 'playing') return;
+    if(++_lockRetry <= 10) setTimeout(requestGameLock, 400);
+  };
+  let p = null;
+  try{ p = canvas.requestPointerLock(); }catch(e){ onFail(); return; }
+  if(p && typeof p.then === 'function') p.then(()=>{ _lockRetry = 0; }).catch(onFail);
+}
+function pauseGame(){
+  if(phase !== 'playing') return;
+  setPhase('paused');
+  mouseDown = false; adsActive = false;
+  for(const k in keys) keys[k] = false;
+  if(document.pointerLockElement === canvas) document.exitPointerLock();
+  document.getElementById('pause-menu').style.display = 'flex';
+}
+function resumeGame(){
+  if(phase !== 'paused') return;
+  audio.resume();
+  // Resume immediately — don't gate gameplay on pointer lock succeeding
+  setPhase('playing');
+  document.getElementById('pause-menu').style.display = 'none';
+  document.getElementById('hud').style.display = 'block';
+  const mm = document.getElementById('minimap'); if(mm) mm.style.display = 'block';
+  _lockRetry = 0;
+  requestGameLock();
+}
+// Esc: pause/resume directly — don't rely only on pointerlockchange.
+// Debounced so one Esc press isn't handled twice (keydown + lock-exit event).
+let _escHandledAt = -1e9;
+function _markEsc(){ _escHandledAt = performance.now(); }
+addEventListener('keydown', e=>{
+  if(e.code !== 'Escape') return;
+  const now = performance.now();
+  if(now - _escHandledAt < 450) return;
+  if(phase === 'playing' && !uiOverlayOpen()){ _markEsc(); pauseGame(); }
+  else if(phase === 'paused'){ _markEsc(); resumeGame(); }
+});
+
 // Dynamic sky — dramatic day/dusk/night cycle (reuses one Color object per frame)
 let skyDayPhase = Math.PI * 0.3;
 const _skyColor = new THREE.Color();
@@ -142,29 +197,46 @@ document.getElementById('blocker').addEventListener('click', ()=>{
     rp2.slice(5,7).forEach(rm=>spawnPickup(rm.x+(Math.random()-.5)*3, rm.z+(Math.random()-.5)*3, 'grenade_black'));
     const crateRoom2 = rp2[7] || rp2[0];
     spawnSupplyCrate(crateRoom2.x, crateRoom2.z);
-    phase = 'playing';
+    setPhase('playing');
     document.getElementById('blocker').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
     const mm = document.getElementById('minimap'); if(mm) mm.style.display = 'block';
-    canvas.requestPointerLock();
+    requestGameLock();
     startWaveCountdown(3);
   }
 });
 
+document.getElementById('pm-resume').addEventListener('click', resumeGame);
+
 addEventListener('pointerlockchange', ()=>{
-  if(document.pointerLockElement === canvas){
-    if(phase === 'menu') phase = 'playing';
+  const locked = document.pointerLockElement === canvas;
+  if(locked){
+    _wasLocked = true; _lockRetry = 0;
+    if(phase === 'menu' || phase === 'paused') setPhase('playing');
+    document.getElementById('pause-menu').style.display = 'none';
     document.getElementById('blocker').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
     const mm2 = document.getElementById('minimap'); if(mm2) mm2.style.display = 'block';
   } else {
-    if(phase === 'playing' && !state.gameOver && !state.inShop){
-      phase = 'menu';
-      document.getElementById('blocker').style.display = 'flex';
-      document.getElementById('hud').style.display = 'none';
-      const mm3 = document.getElementById('minimap'); if(mm3) mm3.style.display = 'none';
+    const hadLock = _wasLocked;
+    _wasLocked = false;
+    // Esc / alt-tab after an actual lock — pause
+    if(phase === 'playing' && !uiOverlayOpen()){
+      if(hadLock){ _markEsc(); pauseGame(); }
+      else requestGameLock(); // stray unlock while lock request pending — keep retrying
     }
   }
+});
+
+addEventListener('pointerlockerror', ()=>{
+  if(phase === 'playing' && !_wasLocked){
+    if(++_lockRetry <= 10) setTimeout(requestGameLock, 400);
+  }
+});
+
+// Window blur: pause if lock was lost, or if lock never engaged after resume
+addEventListener('blur', ()=>{
+  if(phase === 'playing' && document.pointerLockElement !== canvas && !uiOverlayOpen()) pauseGame();
 });
 
 // ============================================================================
@@ -206,8 +278,7 @@ function updateAllI18nElements() {
 
 function updateLangButtons() {
   const lang = I18n.getLang();
-  document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
-  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
 }
 
 // Update language switcher buttons on lang change

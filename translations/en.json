@@ -224,5 +224,10 @@
     "grenade": "Grenade",
     "medkit": "Medkit",
     "flashlight": "Flashlight"
+  },
+  "pause": {
+    "title": "PAUSED",
+    "resume": "RESUME",
+    "language": "Language"
   }
 }

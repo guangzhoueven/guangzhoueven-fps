@@ -7,6 +7,7 @@
 const keys = {};
 let mouseDown = false, lastLeftClick = 0;
 addEventListener('keydown', e=>{
+  if(phase !== 'playing') return;
   keys[e.code] = true;
   if(state.gameOver || !waveActive && state.wave === 0) return;
   if(/^Digit[1-9]$/.test(e.code)) selectSlot(parseInt(e.code.replace('Digit',''))-1);
@@ -20,7 +21,11 @@ addEventListener('keydown', e=>{
 addEventListener('keyup', e=>{ keys[e.code] = false; });
 addEventListener('mousedown', e=>{
   if(state.gameOver) return;
-  if(document.pointerLockElement !== canvas) return;
+  if(document.pointerLockElement !== canvas){
+    // Click while playing but unlocked (e.g. lock failed after resume) — re-lock with user gesture
+    if(phase === 'playing' && !uiOverlayOpen()) requestGameLock();
+    return;
+  }
   if(e.button === 0){ mouseDown = true; dispatchLeftClick(); }
   else if(e.button === 2) adsActive = true;
 });

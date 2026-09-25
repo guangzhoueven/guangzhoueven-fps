@@ -6,12 +6,24 @@
   <title data-i18n="title">霓虹围城 — 波次生存 FPS</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="phase-menu">
 
-<!-- Language Switcher -->
+<!-- Language Switcher (start menu only — hidden during play) -->
 <div id="lang-switch">
-  <button id="btn-zh" class="active" onclick="I18n.setLang('zh')">中文</button>
-  <button id="btn-en" onclick="I18n.setLang('en')">EN</button>
+  <button id="btn-zh" class="lang-btn active" data-lang="zh" onclick="I18n.setLang('zh')">中文</button>
+  <button id="btn-en" class="lang-btn" data-lang="en" onclick="I18n.setLang('en')">EN</button>
+</div>
+
+<!-- Pause Menu (Esc / window blur during play) -->
+<div id="pause-menu">
+  <h2 data-i18n="pause.title">暂停</h2>
+  <button class="pm-btn" id="pm-resume" data-i18n="pause.resume">继续游戏</button>
+  <div class="pm-lang">
+    <span data-i18n="pause.language">选择语言</span>
+    <button class="lang-btn" data-lang="zh" onclick="I18n.setLang('zh')">中文</button>
+    <button class="lang-btn" data-lang="en" onclick="I18n.setLang('en')">EN</button>
+  </div>
+  <a class="pm-github" href="https://github.com/guangzhoueven/guangzhoueven-fps" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
 </div>
 
 <!-- Blocker / Menu -->

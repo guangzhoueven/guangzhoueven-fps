@@ -224,5 +224,10 @@
     "grenade": "手雷",
     "medkit": "医疗包",
     "flashlight": "手电筒"
+  },
+  "pause": {
+    "title": "暂停",
+    "resume": "继续游戏",
+    "language": "选择语言"
   }
 }

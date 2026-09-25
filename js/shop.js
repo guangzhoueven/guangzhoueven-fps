@@ -4,10 +4,11 @@
 // ============================================================================
 // SHOP
 // ============================================================================
-window.leaveShop = function(){ state.inShop = false; document.getElementById('shop').style.display = 'none'; canvas.requestPointerLock(); startWaveCountdown(3); };
+window.leaveShop = function(){ state.inShop = false; document.getElementById('shop').style.display = 'none'; requestGameLock(); startWaveCountdown(3); };
 
 function showShop(){
   state.inShop = true;
+  document.exitPointerLock(); // free the cursor for shop clicks
   document.getElementById('shop-title').textContent = I18n.tf('shop.waveCleared', state.wave);
   document.getElementById('shop-credits').textContent = state.credits;
   const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
@@ -104,6 +105,7 @@ function showPerkSelection(){
   });
   document.getElementById('perk-sub').textContent = I18n.tf('perk.selectPerk', state.wave);
   document.getElementById('perks').style.display = 'flex';
+  document.exitPointerLock(); // free the cursor — after display so uiOverlayOpen() sees it
 }
 window.skipPerk = function(){ document.getElementById('perks').style.display = 'none'; showShop(); };
 function pickPerk(perk){
