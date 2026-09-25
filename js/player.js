@@ -8,6 +8,7 @@ const playerVel = new THREE.Vector3();
 let onGround = true, crouching = false, eyeHeight = 1.6;
 const baseEye=1.6, crouchEye=1.0, GRAVITY=-18, JUMP=7.5;
 let noDamageTimer=0, killStreakCount=0, killStreakTimer=0, lastKillStreakAnnounced=0, bestStreak=0, waveStartTime=0;
+let reviveGuard=0; // invincibility seconds after revive
 let shakeMag=0;
 // Scratch objects for the per-frame player loop (zero allocations in steady state)
 const _pfwd = new THREE.Vector3(), _prgt = new THREE.Vector3(), _pmove = new THREE.Vector3();
@@ -17,6 +18,7 @@ const _psize = new THREE.Vector3();
 function updatePlayer(dt){
   if(state.gameOver) return;
   dt = Math.min(dt, 0.033);
+  if(reviveGuard > 0) reviveGuard = Math.max(0, reviveGuard - dt);
   const sprinting = keys['ShiftLeft'] && state.stamina>0 && !crouching && (keys['KeyW']||keys['KeyA']||keys['KeyS']||keys['KeyD']);
   crouching = !!keys['ControlLeft'];
   state.sprinting = sprinting; state.crouching = crouching;
@@ -76,7 +78,7 @@ function updatePlayer(dt){
   if(shakeMag > 0.001){ camera.position.x += (Math.random()-.5)*shakeMag; camera.position.y += (Math.random()-.5)*shakeMag; camera.position.z += (Math.random()-.5)*shakeMag; shakeMag *= 0.85; }
 }
 function takeDamage(amount, sourcePos){
-  if(state.gameOver || hasPowerup('shield')) return;
+  if(state.gameOver || reviveGuard > 0 || hasPowerup('shield')) return;
   noDamageTimer = 0;
   let remaining = amount;
   if(state.armor > 0){ const absorbed = Math.min(state.armor, amount*0.6); state.armor -= absorbed; remaining -= absorbed; }
@@ -122,4 +124,18 @@ function showDamageDirection(fromPos){
 }
 
 function triggerGameOver(){ state.gameOver = true; if(window.SaveGame) SaveGame.clearRun(); document.exitPointerLock(); showGameOver(); }
+function revivePlayer(){
+  if(!state.gameOver) return;
+  state.gameOver = false;
+  state.hp = state.maxHp;
+  state.armor = state.maxArmor;
+  reviveGuard = 5; // 5s invincibility — time to get away from the swarm
+  document.getElementById('game-over').style.display = 'none';
+  setPhase('playing');
+  document.getElementById('hud').style.display = 'block';
+  const mm = document.getElementById('minimap'); if(mm) mm.style.display = 'block';
+  requestGameLock();
+  if(window.SaveGame) SaveGame.autoSave();
+  toast(I18n.t('toast.revived'), 'success');
+}
 function addShake(mag){ shakeMag = Math.max(shakeMag, mag); }

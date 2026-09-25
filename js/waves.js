@@ -5,6 +5,7 @@
 // WAVES
 // ============================================================================
 let waveCountdown=0, waveActive=false, supplyDropTimer=35;
+let spawnQueue=[]; // pending spawns {at,x,z,kind} — drained each frame, pauses while dead
 let currentObjective=null, waveStartHp=100, waveStartHeadshots=0, waveStartKills=0, waveGrenadeKill=false, waveBarrelKill=false;
 let excludedObjectives=[];
 
@@ -28,46 +29,51 @@ function startNextWave(){
   assignObjective();
   if(isBoss){ audio.bossSpawn(); spawnBoss(); showBossIntro(); toast(I18n.tf('toast.bossWave', state.wave), 'danger'); }
   else toast(I18n.tf('toast.waveIncoming', state.wave), 'warn');
+  // Queue spawns — processed every frame by processSpawns() so the displayed
+  // total always equals the number actually spawned (pauses while dead, resumes on revive)
+  spawnQueue = [];
   for(let i=0;i<count;i++){
-    setTimeout(()=>{
-      if(state.gameOver) return;
-      // 75% spawn in open outdoor areas, 25% near rooms
-      let sx, sz;
-      if(Math.random() < 0.25){
-        // Near a room
-        const spawnRoom = ROOMS[Math.floor(Math.random()*ROOMS.length)];
-        const angle=Math.random()*Math.PI*2, radius=2+Math.random()*3;
-        sx = spawnRoom.x + radius*Math.cos(angle);
-        sz = spawnRoom.z + radius*Math.sin(angle);
-      } else {
-        // Random outdoor position — spread across the whole map
-        const angle=Math.random()*Math.PI*2, radius=8+Math.random()*28;
-        sx = radius*Math.cos(angle);
-        sz = radius*Math.sin(angle);
-      }
-      let kind='grunt'; const r=Math.random();
-      if(state.wave>=7 && r<0.10) kind='tank';
-      else if(state.wave>=6 && r<0.18) kind='shooter';
-      else if(state.wave>=4 && r<0.3) kind='brute';
-      else if(state.wave>=2 && r<0.45) kind='phantom';
-      else if(state.wave>=3 && r<0.55) kind='runner';
-      enemies.push(new Enemy(sx, sz, kind, state.wave));
-      // If enemy spawned inside a wall, reposition
-      const lastE = enemies[enemies.length-1];
-      let attempts2 = 0;
-      while(attempts2 < 5){
-        const eBB = new THREE.Box3(new THREE.Vector3(lastE.mesh.position.x-lastE.size, 0, lastE.mesh.position.z-lastE.size), new THREE.Vector3(lastE.mesh.position.x+lastE.size, 1.5, lastE.mesh.position.z+lastE.size));
-        let stuck = false;
-        for(const col of wallColliders){ if(col && eBB.intersectsBox(col)){ stuck = true; break; } }
-        if(!stuck) break;
-        // Reposition nearby
-        const a2 = Math.random()*Math.PI*2, r2 = 2+Math.random()*3;
-        lastE.mesh.position.x = sx + r2*Math.cos(a2);
-        lastE.mesh.position.z = sz + r2*Math.sin(a2);
-        attempts2++;
-      }
-      state.enemiesAlive++;
-    }, i*250);
+    let sx, sz;
+    // 75% spawn in open outdoor areas, 25% near rooms
+    if(Math.random() < 0.25){
+      const spawnRoom = ROOMS[Math.floor(Math.random()*ROOMS.length)];
+      const angle=Math.random()*Math.PI*2, radius=2+Math.random()*3;
+      sx = spawnRoom.x + radius*Math.cos(angle);
+      sz = spawnRoom.z + radius*Math.sin(angle);
+    } else {
+      const angle=Math.random()*Math.PI*2, radius=8+Math.random()*28;
+      sx = radius*Math.cos(angle);
+      sz = radius*Math.sin(angle);
+    }
+    let kind='grunt'; const r=Math.random();
+    if(state.wave>=7 && r<0.10) kind='tank';
+    else if(state.wave>=6 && r<0.18) kind='shooter';
+    else if(state.wave>=4 && r<0.3) kind='brute';
+    else if(state.wave>=2 && r<0.45) kind='phantom';
+    else if(state.wave>=3 && r<0.55) kind='runner';
+    spawnQueue.push({ at: clock.elapsedTime + i*0.25, sx, sz, kind });
+  }
+}
+// Drain due spawns — called from the animate loop while playing
+function processSpawns(){
+  if(state.gameOver) return; // wait out death — remaining spawns resume after revive
+  while(spawnQueue.length && spawnQueue[0].at <= clock.elapsedTime){
+    const s = spawnQueue.shift();
+    const e = new Enemy(s.sx, s.sz, s.kind, state.wave);
+    enemies.push(e);
+    // If enemy spawned inside a wall, reposition
+    let attempts2 = 0;
+    while(attempts2 < 5){
+      const eBB = new THREE.Box3(new THREE.Vector3(e.mesh.position.x-e.size, 0, e.mesh.position.z-e.size), new THREE.Vector3(e.mesh.position.x+e.size, 1.5, e.mesh.position.z+e.size));
+      let stuck = false;
+      for(const col of wallColliders){ if(col && eBB.intersectsBox(col)){ stuck = true; break; } }
+      if(!stuck) break;
+      const a2 = Math.random()*Math.PI*2, r2 = 2+Math.random()*3;
+      e.mesh.position.x = s.sx + r2*Math.cos(a2);
+      e.mesh.position.z = s.sz + r2*Math.sin(a2);
+      attempts2++;
+    }
+    state.enemiesAlive++;
   }
 }
 function spawnBoss(){

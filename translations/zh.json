@@ -157,6 +157,7 @@
     "saveImported": "存档导入成功，正在重新加载…",
     "saveInvalid": "存档无效或已损坏",
     "runResumed": "已恢复第 {0} 波进度",
+    "revived": "已复活（5 秒无敌）",
     "dataCleared": "已清除数据"
   },
   "shop": {
@@ -196,6 +197,7 @@
   },
   "gameOver": {
     "title": "你死了",
+    "revive": "复活",
     "restart": "重新开始",
     "waveReached": "到达波次",
     "wavesSurvived": "存活波次",

@@ -49,6 +49,7 @@ const SaveGame = {
     this.write(d);
   },
   autoSave(){
+    if(this._importing) return; // import reload in progress — never clobber the imported data
     if(typeof phase === 'undefined') return;
     if(phase !== 'playing' && phase !== 'paused') return;
     if(state.gameOver){ this.save(null); return; }
@@ -139,6 +140,7 @@ const SaveGame = {
           achievements: d.achievements || {},
           run: d.run || null,
         });
+        this._importing = true; // the upcoming reload's pagehide autosave must not overwrite this
         toast(I18n.t('toast.saveImported'), 'success');
         setTimeout(()=>location.reload(), 700);
       }catch(e){ toast(I18n.t('toast.saveInvalid'), 'danger'); }

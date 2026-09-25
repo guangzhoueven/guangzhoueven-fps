@@ -184,6 +184,8 @@ canvas{display:block}
 .go-stat .gl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.45)}
 .go-stat .gv{font-family:monospace;font-size:20px;font-weight:700;color:#fff;margin-top:2px}
 #game-over button{margin-top:16px;padding:12px 32px;font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:2px;background:linear-gradient(90deg,#fbbf24,#f97316);color:#000;border:none;border-radius:8px;cursor:pointer;pointer-events:auto}
+#game-over .go-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+#game-over #go-revive{background:linear-gradient(90deg,#4ade80,#16a34a)}
 
 /* Shop */
 #shop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:150;overflow-y:auto;padding:20px}

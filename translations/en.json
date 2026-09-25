@@ -157,6 +157,7 @@
     "saveImported": "Save imported, reloading…",
     "saveInvalid": "Invalid or corrupted save",
     "runResumed": "Resumed at wave {0}",
+    "revived": "Revived (5s invincible)",
     "dataCleared": "Data cleared"
   },
   "shop": {
@@ -196,6 +197,7 @@
   },
   "gameOver": {
     "title": "YOU DIED",
+    "revive": "REVIVE",
     "restart": "Restart",
     "waveReached": "Wave Reached",
     "wavesSurvived": "Waves Survived",

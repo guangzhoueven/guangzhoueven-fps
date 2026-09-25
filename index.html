@@ -158,7 +158,10 @@
 <div id="game-over">
   <h1 data-i18n="gameOver.title">你死了</h1>
   <div id="go-stats"></div>
-  <button onclick="location.reload()" data-i18n="gameOver.restart">重新开始</button>
+  <div class="go-btns">
+    <button id="go-revive" onclick="revivePlayer()" data-i18n="gameOver.revive">复活</button>
+    <button onclick="location.reload()" data-i18n="gameOver.restart">重新开始</button>
+  </div>
 </div>
 
 <!-- Shop -->

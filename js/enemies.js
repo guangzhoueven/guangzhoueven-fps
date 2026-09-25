@@ -284,7 +284,7 @@ class Enemy {
     else if(dropRoll < 0.57+luckBoost){ spawnPowerup(this.mesh.position.x, this.mesh.position.z); }
     audio.enemyDeath();
     // Only complete wave when all enemies have spawned AND all are dead
-    if(state.enemiesAlive <= 0 && enemies.filter(e=>e.alive && !e.dying).length === 0 && waveActive) completeWave();
+    if(state.enemiesAlive <= 0 && spawnQueue.length === 0 && enemies.filter(e=>e.alive && !e.dying).length === 0 && waveActive) completeWave();
   }
   updateHpBar(){
     if(!this.barCtx || !this.barSprite) return;

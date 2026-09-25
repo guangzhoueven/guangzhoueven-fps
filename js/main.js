@@ -134,6 +134,7 @@ function animate(){
     if(mouseDown){ if(sel && WEAPONS[sel.type]?.auto) fireWeapon(); }
     for(const en of enemies) en.update(dt, enemies);
     updateGrenades(dt); updateProjectiles(dt); updateParticles(dt); updateScorePopups(dt);
+    processSpawns();
     updatePickups(time); updateDoors(dt); updateWeaponAnim(dt);
     updateComboAndRegen(dt); // handles combo/streak decay, noDamageTimer and regen (duplicated block removed — it made these tick 2x fast)
     updatePowerups(dt); updateSupplyDrops(dt); updateDust(dt);
