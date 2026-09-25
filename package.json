@@ -1,0 +1,50 @@
+{
+  "name": "neon-siege",
+  "productName": "NeonSiege",
+  "version": "1.0.0",
+  "description": "NEON SIEGE - Wave Survival FPS",
+  "author": "NeonSiege",
+  "private": true,
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.neonsiege.game",
+    "productName": "NeonSiege",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-main.js",
+      "index.html",
+      "css/**/*",
+      "js/**/*",
+      "translations/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Neon Siege",
+      "artifactName": "NeonSiege-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "NeonSiege-Portable-${version}.exe"
+    }
+  }
+}
