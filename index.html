@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="title">霓虹围城 — 波次生存 FPS</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Language Switcher -->
+<div id="lang-switch">
+  <button id="btn-zh" class="active" onclick="I18n.setLang('zh')">中文</button>
+  <button id="btn-en" onclick="I18n.setLang('en')">EN</button>
+</div>
+
+<!-- Blocker / Menu -->
+<div id="blocker">
+  <div id="instructions">
+    <div class="sub" data-i18n="menu.subtitle">波次生存 FPS</div>
+    <h1 data-i18n="menu.name">霓虹围城</h1>
+    <div class="sub" data-i18n="menu.tagline">坚守阵地，抵御潮水般的敌人。</div>
+    <div class="diff-row">
+      <button class="diff-btn active" data-d="normal" onclick="setDifficulty('normal'); event.stopPropagation();" data-i18n="menu.difficulty.normal">普通</button>
+      <button class="diff-btn" data-d="hard" onclick="setDifficulty('hard'); event.stopPropagation();" data-i18n="menu.difficulty.hard">困难</button>
+      <button class="diff-btn" data-d="nightmare" onclick="setDifficulty('nightmare'); event.stopPropagation();" data-i18n="menu.difficulty.nightmare">噩梦</button>
+    </div>
+    <div class="controls">
+      <div class="ctrl"><span class="key">WASD</span> <span data-i18n="menu.controls.move">移动</span></div>
+      <div class="ctrl"><span class="key">Mouse</span> <span data-i18n="menu.controls.look">视角</span></div>
+      <div class="ctrl"><span class="key">L-Click</span> <span data-i18n="menu.controls.fire">射击/开门</span></div>
+      <div class="ctrl"><span class="key">R-Click</span> <span data-i18n="menu.controls.ads">瞄准</span></div>
+      <div class="ctrl"><span class="key">G</span> <span data-i18n="menu.controls.grenade">手雷</span></div>
+      <div class="ctrl"><span class="key">Tab</span> <span data-i18n="menu.controls.weaponStats">武器属性</span></div>
+      <div class="ctrl"><span class="key">R</span> <span data-i18n="menu.controls.reload">换弹</span></div>
+      <div class="ctrl"><span class="key">Space</span> <span data-i18n="menu.controls.jump">跳跃</span></div>
+      <div class="ctrl"><span class="key">Shift</span> <span data-i18n="menu.controls.sprint">冲刺</span></div>
+      <div class="ctrl"><span class="key">Ctrl</span> <span data-i18n="menu.controls.crouch">蹲下</span></div>
+      <div class="ctrl"><span class="key">E</span> <span data-i18n="menu.controls.interact">互动</span></div>
+      <div class="ctrl"><span class="key">F</span> <span data-i18n="menu.controls.flashlight">手电筒</span></div>
+      <div class="ctrl"><span class="key">1-6</span> <span data-i18n="menu.controls.weapons">切换武器</span></div>
+      <div class="ctrl"><span class="key">Q</span> <span data-i18n="menu.controls.swap">切换装备</span></div>
+    </div>
+    <div class="play" data-i18n="menu.play">▶ 点击开始游戏</div>
+  </div>
+</div>
+
+<!-- Game canvas (behind everything) -->
+<canvas id="game-canvas" style="display:block;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="crosshair"></div>
+  <div id="hitmarker"><div class="hl hl-tl"></div><div class="hl hl-tr"></div><div class="hl hl-bl"></div><div class="hl hl-br"></div></div>
+  <div id="kill-badge"></div>
+  <div id="stats">
+    <div class="row"><span class="lbl" data-i18n="hud.score">得分</span><span class="val score" id="s-score">0</span></div>
+    <div class="row"><span class="lbl" style="color:#fbbf24" data-i18n="hud.credits">积分</span><span class="val credits" id="s-credits">0</span></div>
+    <div class="row"><span class="lbl" style="color:#fb923c" data-i18n="hud.combo">连击</span><span class="val combo" id="s-combo">×1.00</span></div>
+  </div>
+  <div id="wave-info">
+    <div class="wi-row">
+      <span class="wi" data-i18n="hud.wave">波次</span><span class="wv" id="w-num">00</span>
+      <span class="wi" data-i18n="hud.hostiles">敌人</span><span class="hv" id="w-host">0/0</span>
+    </div>
+    <div id="wave-bar"><div id="wave-bar-fill" style="width:0%"></div></div>
+  </div>
+  <div id="killfeed"></div>
+  <div id="objective">
+    <div class="oh"><span>🎯 <span data-i18n="hud.objective">目标</span></span><span class="rw" id="obj-rw">+0</span></div>
+    <div class="ob" id="obj-text"></div>
+    <div class="op" id="obj-prog" style="display:none">
+      <div class="opl"><span data-i18n="hud.progress">进度</span><span id="obj-pn">0/0</span></div>
+      <div class="opb"><div class="opf" id="obj-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div id="vitals">
+    <div class="vital">
+      <div class="vl"><span>❤️ <span data-i18n="hud.health">生命值</span></span><span class="vv" id="hp-val">100/100</span></div>
+      <div class="bar"><div class="fill" id="hp-fill" style="width:100%"></div></div>
+    </div>
+    <div class="vital">
+      <div class="vl"><span>🛡️ <span data-i18n="hud.armor">护甲</span></span><span class="vv" id="ar-val" style="color:#7dd3fc">0/100</span></div>
+      <div class="bar"><div class="fill" id="armor-fill" style="width:0%"></div></div>
+    </div>
+    <div class="vital">
+      <div class="vl"><span>⚡ <span data-i18n="hud.stamina">体力</span></span><span class="vv" id="st-val" style="color:#fbbf24">100</span></div>
+      <div class="bar"><div class="fill" id="stam-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+  <div id="hotbar"></div>
+  <div id="ammo">
+    <div class="wn" id="a-name">Pistol</div>
+    <div><span class="ac" id="a-cur">12</span> <span class="ar">/ <span id="a-res">96</span></span></div>
+    <div id="a-extra"></div>
+    <div id="reload-bar" style="display:none"><div id="reload-bar-fill" style="width:0%"></div></div>
+  </div>
+  <div id="boss-bar">
+    <div class="bn" id="bb-name">BEHEMOTH</div>
+    <div class="bb"><div class="bf" id="bb-fill" style="width:100%"></div></div>
+  </div>
+  <div id="powerups"></div>
+  <div id="tip-text" style="position:absolute;bottom:90px;left:50%;transform:translateX(-50%);font-size:12px;font-style:italic;color:#f97316;opacity:0.85;text-align:center;pointer-events:none;display:none;text-shadow:0 1px 4px rgba(0,0,0,.8);"></div>
+  <div id="wave-announce">
+    <div class="wa-w" id="wa-wave">WAVE 1</div>
+    <div class="wa-c" id="wa-count">3</div>
+    <div class="wa-s" id="wa-sub">INCOMING</div>
+  </div>
+</div>
+
+<!-- Minimap (above HUD) -->
+<canvas id="minimap" width="150" height="150" style="position:fixed;top:16px;left:16px;z-index:55;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(8,6,4,.72);pointer-events:none;display:none;"></canvas>
+
+<div id="toasts"></div>
+<div id="streak-msg" style="position:fixed;top:38%;left:50%;transform:translate(-50%,-50%);font-size:clamp(2rem,8vw,4rem);font-weight:900;text-transform:uppercase;color:#f97316;text-shadow:0 0 30px rgba(249,115,22,.8),0 0 60px rgba(249,115,22,.4);opacity:0;pointer-events:none;z-index:60;transition:opacity 0.2s;"></div>
+<div id="dmg-overlay"></div>
+<div id="dmg-dir"></div>
+<div id="vignette"></div>
+<div id="boss-intro">
+  <div class="bi-w">⚠ <span data-i18n="boss.warning">警告</span> ⚠</div>
+  <div class="bi-t" data-i18n="boss.title">BOSS</div>
+  <div class="bi-n" id="bi-name">BEHEMOTH</div>
+  <div class="bi-s" data-i18n="boss.entered">已进入竞技场</div>
+</div>
+
+<!-- Game Over -->
+<div id="game-over">
+  <h1 data-i18n="gameOver.title">你死了</h1>
+  <div id="go-stats"></div>
+  <button onclick="location.reload()" data-i18n="gameOver.restart">重新开始</button>
+</div>
+
+<!-- Shop -->
+<div id="shop">
+  <h2 id="shop-title" data-i18n="shop.waveCleared">波已清除</h2>
+  <div class="sc"><span data-i18n="shop.credits">积分</span>: <span id="shop-credits">0</span> 🪙</div>
+  <div id="shop-grid"></div>
+  <button id="next-wave" onclick="leaveShop()" data-i18n="shop.nextWave">下一波 ▶</button>
+</div>
+
+<!-- Perks -->
+<div id="perks">
+  <h2 data-i18n="perkSelect.title">选择增益</h2>
+  <div class="ps" id="perk-sub" data-i18n="perkSelect.subtitle">选择一项增益</div>
+  <div class="perk-grid" id="perk-grid"></div>
+  <button class="skip" onclick="skipPerk()" data-i18n="perkSelect.skip">跳过，进入商店</button>
+</div>
+
+<!-- Weapon Stats Panel -->
+<div id="wp-stats" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,20,0.92);border:2px solid #f97316;border-radius:12px;padding:20px;color:#fff;font-family:monospace;z-index:9999;min-width:340px;">
+  <div id="wp-title" style="color:#f97316;font-size:18px;margin-bottom:12px;">— <span data-i18n="weaponStats.title">武器属性</span> —</div>
+  <div id="wp-content"></div>
+</div>
+
+<script src="js/vendor/three.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/config.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/textures.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/world.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/items.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/player.js"></script>
+<script src="js/waves.js"></script>
+<script src="js/input.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

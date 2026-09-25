@@ -1,0 +1,228 @@
+{
+  "lang": "zh",
+  "title": "霓虹围城 — 波次生存 FPS",
+  "menu": {
+    "subtitle": "波次生存 FPS",
+    "name": "霓虹围城",
+    "tagline": "坚守阵地，抵御潮水般的敌人。",
+    "play": "▶ 点击开始游戏",
+    "difficulty": {
+      "normal": "普通",
+      "hard": "困难",
+      "nightmare": "噩梦"
+    },
+    "controls": {
+      "move": "移动",
+      "look": "视角",
+      "fire": "射击/开门",
+      "ads": "瞄准",
+      "grenade": "手雷",
+      "weaponStats": "武器属性",
+      "reload": "换弹",
+      "jump": "跳跃",
+      "sprint": "冲刺",
+      "crouch": "蹲下",
+      "interact": "互动",
+      "flashlight": "手电筒",
+      "weapons": "切换武器",
+      "swap": "切换装备"
+    }
+  },
+  "hud": {
+    "score": "得分",
+    "credits": "积分",
+    "combo": "连击",
+    "wave": "波次",
+    "hostiles": "敌人",
+    "objective": "目标",
+    "progress": "进度",
+    "health": "生命值",
+    "armor": "护甲",
+    "stamina": "体力"
+  },
+  "weapon": {
+    "pistol": "手枪",
+    "smg": "冲锋枪",
+    "shotgun": "霰弹枪",
+    "rifle": "突击步枪",
+    "sniper": "狙击枪",
+    "rocket": "火箭筒",
+    "crossbow": "弩",
+    "minigun": "机枪"
+  },
+  "enemy": {
+    "grunt": "步兵",
+    "runner": "奔袭者",
+    "brute": "蛮兵",
+    "shooter": "射手",
+    "boss": "巨兽",
+    "phantom": "幻影",
+    "tank": "重坦"
+  },
+  "powerup": {
+    "speed": "加速",
+    "damage": "双倍伤害",
+    "rapid": "急速射击",
+    "shield": "无敌"
+  },
+  "perk": {
+    "fast_reload": "快手",
+    "fast_reload_desc": "换弹速度提升 25%",
+    "extra_hp": "铁壁",
+    "extra_hp_desc": "最大生命值 +20 并恢复",
+    "extra_armor": "战斗就绪",
+    "extra_armor_desc": "最大护甲 +20 并恢复",
+    "more_damage": "重型弹药",
+    "more_damage_desc": "武器伤害 +15%",
+    "faster_sprint": "飞毛腿",
+    "faster_sprint_desc": "移动速度 +20%",
+    "extra_grenade": "掷弹兵",
+    "extra_grenade_desc": "手雷 +2",
+    "cheaper_shops": "砍价王",
+    "cheaper_shops_desc": "商店价格 -20%",
+    "regen_boost": "生命恢复",
+    "regen_boost_desc": "回血速度加快",
+    "combo_master": "连击大师",
+    "combo_master_desc": "连击持续时间 +50%",
+    "lucky_drops": "幸运星",
+    "lucky_drops_desc": "掉落率 +25%",
+    "selectPerk": "第 {0} 波已清除 - 选择一项增益"
+  },
+  "achievement": {
+    "unlocked": "成就解锁",
+    "first_blood": "一血",
+    "first_blood_desc": "获得你的第一个击杀",
+    "headhunter": "猎头者",
+    "headhunter_desc": "单波内爆头 10 次",
+    "demo_expert": "爆破专家",
+    "demo_expert_desc": "单波内用油桶炸死 5 个敌人",
+    "untouchable": "完美无伤",
+    "untouchable_desc": "无伤通过一个波次",
+    "collector": "武器收藏家",
+    "collector_desc": "拥有全部武器"
+  },
+  "tips": [
+    "按 Q 切换武器",
+    "瞄准头部可造成额外伤害",
+    "利用爆炸油桶！",
+    "手雷可以引爆油桶",
+    "蹲下可以躲在掩体后",
+    "留意空投补给！",
+    "按住 Shift 冲刺",
+    "右键瞄准",
+    "Tab 键查看武器属性"
+  ],
+  "objective": {
+    "headshots": "爆头击杀 3 次",
+    "no_damage": "无伤通过波次",
+    "kills": "击败 8 个敌人",
+    "combo_5": "达成 5 连击",
+    "grenade_kill": "用手雷击杀敌人",
+    "barrel_kill": "用爆炸油桶击杀敌人"
+  },
+  "killstreak": {
+    "tripleKill": "三连杀！",
+    "triple": "三连杀！",
+    "rampage": "暴走！",
+    "unstoppable": "势不可挡！",
+    "godlike": "超神！"
+  },
+  "toast": {
+    "achievement": "成就",
+    "noMedkits": "没有医疗包",
+    "hpFull": "生命值已满",
+    "healHp": "+50 生命值",
+    "bossDefeated": "BOSS 击败！+1000",
+    "activated": "已激活！",
+    "bossWave": "BOSS 波次 {0}",
+    "waveIncoming": "第 {0} 波来袭！",
+    "waveCleared": "第 {0} 波已清除！",
+    "objectiveAssign": "{0} - 奖励: {1}",
+    "objectiveComplete": "目标完成！+{0}",
+    "objectiveFailed": "目标失败",
+    "pickedMedkit": "拾取医疗包",
+    "pickupAmmo": "+30 弹药",
+    "pickedAmmo": "+30 弹药",
+    "pickupGrenade": "+1 手雷",
+    "pickedGrenade": "+1 手雷",
+    "pickupArmor": "+50 护甲",
+    "pickedArmor": "+50 护甲",
+    "supplyCrate": "补给箱：+2 医疗包，+30 弹药，+2 手雷！",
+    "supplyDropped": "补给箱已投下！寻找金色光芒！",
+    "perkAcquired": "{0} 已获得！"
+  },
+  "shop": {
+    "waveCleared": "第 {0} 波已清除",
+    "credits": "积分",
+    "nextWave": "下一波 ▶",
+    "buy": "购买",
+    "ammo": "弹药",
+    "damage": "伤害",
+    "mag": "弹夹",
+    "refillToMax": "补满",
+    "upgradeMaxHp": "最大生命值 +25",
+    "upgradeMaxHpDesc": "永久 +25 生命值并恢复",
+    "upgradeMaxArmor": "最大护甲 +25",
+    "upgradeMaxArmorDesc": "+25 护甲并恢复",
+    "upgradeSpeed": "移动速度 +10%",
+    "upgradeSpeedDesc": "移动更快",
+    "upgradeReload": "换弹速度 +15%",
+    "upgradeReloadDesc": "换弹更快",
+    "medkit": "医疗包",
+    "medkitDesc": "恢复 50 生命值",
+    "grenadex2": "手雷 x2",
+    "grenadex2Desc": "两枚破片手雷",
+    "armorPlate": "护甲板",
+    "armorPlateDesc": "恢复护甲"
+  },
+  "perkSelect": {
+    "title": "选择增益",
+    "subtitle": "选择一项增益",
+    "skip": "跳过，进入商店",
+    "cleared": "已清除 - 选择一项增益"
+  },
+  "boss": {
+    "warning": "警告",
+    "title": "BOSS",
+    "entered": "已进入竞技场"
+  },
+  "gameOver": {
+    "title": "你死了",
+    "restart": "重新开始",
+    "waveReached": "到达波次",
+    "wavesSurvived": "存活波次",
+    "score": "得分",
+    "kills": "击杀",
+    "headshots": "爆头",
+    "accuracy": "命中率",
+    "damageDealt": "造成伤害",
+    "damageTaken": "受到伤害",
+    "bestCombo": "最高连击"
+  },
+  "weaponStats": {
+    "title": "武器属性",
+    "damage": "伤害",
+    "fireRate": "射速",
+    "mag": "弹夹",
+    "range": "射程",
+    "type": "类型",
+    "reload": "换弹"
+  },
+  "ammo": {
+    "reloading": "换弹中",
+    "reload": "换弹",
+    "pressRToReload": "按 R 换弹",
+    "depleted": "弹药耗尽",
+    "low": "弹药不足",
+    "fullAuto": "全自动",
+    "semiAuto": "半自动"
+  },
+  "wave": {
+    "nextWave": "第 {0} 波"
+  },
+  "item": {
+    "grenade": "手雷",
+    "medkit": "医疗包",
+    "flashlight": "手电筒"
+  }
+}
