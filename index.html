@@ -23,7 +23,24 @@
     <button class="lang-btn" data-lang="zh" onclick="I18n.setLang('zh')">中文</button>
     <button class="lang-btn" data-lang="en" onclick="I18n.setLang('en')">EN</button>
   </div>
+  <div class="pm-data">
+    <button class="pm-btn pm-sm" id="pm-export" data-i18n="pause.exportData">导出数据</button>
+    <button class="pm-btn pm-sm" id="pm-import" data-i18n="pause.importData">导入数据</button>
+    <button class="pm-btn pm-sm pm-danger" id="pm-clear" data-i18n="pause.clearData">清除数据</button>
+  </div>
   <a class="pm-github" href="https://github.com/guangzhoueven/guangzhoueven-fps" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+</div>
+
+<!-- In-page confirm dialog (clear data) -->
+<div id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" data-i18n="pause.clearData">清除数据</div>
+    <div class="confirm-text" data-i18n="pause.clearConfirm">确定要清除所有数据吗？设置、成就和游戏进度都会被删除，且无法恢复。</div>
+    <div class="confirm-btns">
+      <button class="pm-btn pm-sm" id="confirm-cancel" data-i18n="pause.cancel">取消</button>
+      <button class="pm-btn pm-sm pm-danger" id="confirm-ok" data-i18n="pause.ok">确定</button>
+    </div>
+  </div>
 </div>
 
 <!-- Blocker / Menu -->
@@ -53,7 +70,8 @@
       <div class="ctrl"><span class="key">1-6</span> <span data-i18n="menu.controls.weapons">切换武器</span></div>
       <div class="ctrl"><span class="key">Q</span> <span data-i18n="menu.controls.swap">切换装备</span></div>
     </div>
-    <div class="play" data-i18n="menu.play">▶ 点击开始游戏</div>
+    <button class="play" id="btn-new-game" data-i18n="menu.newGame">▶ 新游戏</button>
+    <div class="play" id="btn-continue" style="display:none">▶ 继续上次进度</div>
   </div>
 </div>
 
@@ -124,6 +142,7 @@
 <canvas id="minimap" width="150" height="150" style="position:fixed;top:16px;left:16px;z-index:55;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(8,6,4,.72);pointer-events:none;display:none;"></canvas>
 
 <div id="toasts"></div>
+<input type="file" id="save-file-input" accept=".json,application/json" style="display:none">
 <div id="streak-msg" style="position:fixed;top:38%;left:50%;transform:translate(-50%,-50%);font-size:clamp(2rem,8vw,4rem);font-weight:900;text-transform:uppercase;color:#f97316;text-shadow:0 0 30px rgba(249,115,22,.8),0 0 60px rgba(249,115,22,.4);opacity:0;pointer-events:none;z-index:60;transition:opacity 0.2s;"></div>
 <div id="dmg-overlay"></div>
 <div id="dmg-dir"></div>
@@ -181,6 +200,7 @@
 <script src="js/input.js"></script>
 <script src="js/hud.js"></script>
 <script src="js/shop.js"></script>
+<script src="js/save.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

@@ -38,6 +38,7 @@ function pauseGame(){
   for(const k in keys) keys[k] = false;
   if(document.pointerLockElement === canvas) document.exitPointerLock();
   document.getElementById('pause-menu').style.display = 'flex';
+  if(window.SaveGame) SaveGame.autoSave();
 }
 function resumeGame(){
   if(phase !== 'paused') return;
@@ -59,7 +60,11 @@ addEventListener('keydown', e=>{
   const now = performance.now();
   if(now - _escHandledAt < 450) return;
   if(phase === 'playing' && !uiOverlayOpen()){ _markEsc(); pauseGame(); }
-  else if(phase === 'paused'){ _markEsc(); resumeGame(); }
+  else if(phase === 'paused'){
+    _markEsc();
+    if(window.SaveGame && SaveGame.confirmOpen()){ SaveGame.closeConfirm(); return; }
+    resumeGame();
+  }
 });
 
 // Dynamic sky — dramatic day/dusk/night cycle (reuses one Color object per frame)
@@ -154,9 +159,17 @@ function animate(){
 // ============================================================================
 // START
 // ============================================================================
-document.getElementById('blocker').addEventListener('click', ()=>{
+document.getElementById('blocker').addEventListener('click', ()=> startGame(false));
+const _continueBtn = document.getElementById('btn-continue');
+if(_continueBtn) _continueBtn.addEventListener('click', e=>{ e.stopPropagation(); startGame(true); });
+const _newGameBtn = document.getElementById('btn-new-game');
+if(_newGameBtn) _newGameBtn.addEventListener('click', e=>{ e.stopPropagation(); startGame(false); });
+
+function startGame(resume){
   audio.init(); audio.resume();
   if(phase === 'menu' || state.gameOver){
+    // New game after a soft-clear → this is when the data is really deleted
+    if(!resume && window.SaveGame) SaveGame.purge();
     // Reset game
     state.hp=100; state.maxHp=100; state.armor=0; state.maxArmor=100; state.score=0; state.credits=0;
     state.wave=0; state.enemiesAlive=0; state.enemiesTotal=0; state.gameOver=false;
@@ -167,6 +180,32 @@ document.getElementById('blocker').addEventListener('click', ()=>{
     weaponAmmo = {pistol:{mag:12,reserve:96}};
     medkitCount = 0;
     damageMult=1; moveSpeedMult=1; reloadSpeedMult=1; shopDiscount=0; regenBoost=0; comboBoost=0; luckBoost=0;
+    // Resume from save — override the fresh defaults with the saved run
+    const run = (resume && window.SaveGame) ? SaveGame.getRun() : null;
+    if(run){
+      if(run.maxHp) state.maxHp = run.maxHp;
+      if(typeof run.hp === 'number') state.hp = Math.min(run.hp, state.maxHp);
+      if(run.maxArmor) state.maxArmor = run.maxArmor;
+      if(typeof run.armor === 'number') state.armor = Math.min(run.armor, state.maxArmor);
+      if(typeof run.score === 'number') state.score = run.score;
+      if(typeof run.credits === 'number') state.credits = run.credits;
+      if(typeof run.grenades === 'number') state.grenades = run.grenades;
+      if(run.stats) state.stats = Object.assign({}, state.stats, run.stats);
+      if(Array.isArray(run.activePerks)) state.activePerks = run.activePerks;
+      if(run.ownedWeapons && run.ownedWeapons.length) ownedWeapons = new Set(run.ownedWeapons);
+      if(run.weaponAmmo) weaponAmmo = run.weaponAmmo;
+      if(typeof run.medkitCount === 'number') medkitCount = run.medkitCount;
+      if(typeof run.selectedSlot === 'number') state.selectedSlot = run.selectedSlot;
+      if(typeof run.damageMult === 'number') damageMult = run.damageMult;
+      if(typeof run.moveSpeedMult === 'number') moveSpeedMult = run.moveSpeedMult;
+      if(typeof run.reloadSpeedMult === 'number') reloadSpeedMult = run.reloadSpeedMult;
+      if(typeof run.shopDiscount === 'number') shopDiscount = run.shopDiscount;
+      if(typeof run.regenBoost === 'number') regenBoost = run.regenBoost;
+      if(typeof run.comboBoost === 'number') comboBoost = run.comboBoost;
+      if(typeof run.luckBoost === 'number') luckBoost = run.luckBoost;
+      if(run.resumeWave) state.wave = Math.max(0, run.resumeWave - 1);
+      toast(I18n.tf('toast.runResumed', run.resumeWave || 1), 'success');
+    }
     // Reset doors
     for(const door of doors){
       // Random initial open/closed state
@@ -204,7 +243,7 @@ document.getElementById('blocker').addEventListener('click', ()=>{
     requestGameLock();
     startWaveCountdown(3);
   }
-});
+}
 
 document.getElementById('pm-resume').addEventListener('click', resumeGame);
 
@@ -258,6 +297,8 @@ async function initI18n() {
   await I18n.init();
   updateAllI18nElements();
   updateLangButtons();
+  if(window.SaveGame) SaveGame.refreshContinueBtn();
+  if(window.SaveGame) SaveGame.showClearedToast();
   // Update game title
   document.title = I18n.t('title');
 }

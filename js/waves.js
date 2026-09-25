@@ -103,6 +103,7 @@ function completeWave(){
   for(const p of projectiles) scene.remove(p.mesh);
   projectiles = [];
   evaluateObjective();
+  if(window.SaveGame) SaveGame.autoSave();
   setTimeout(()=>{
     // Show perks even if player died on the winning frame; only skip if truly not in a valid game
     if(state.gameOver) showShop();

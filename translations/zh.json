@@ -6,6 +6,8 @@
     "name": "霓虹围城",
     "tagline": "坚守阵地，抵御潮水般的敌人。",
     "play": "▶ 点击开始游戏",
+    "newGame": "▶ 新游戏",
+    "continue": "▶ 继续上次进度（第 {0} 波）",
     "difficulty": {
       "normal": "普通",
       "hard": "困难",
@@ -149,7 +151,13 @@
     "pickedArmor": "+50 护甲",
     "supplyCrate": "补给箱：+2 医疗包，+30 弹药，+2 手雷！",
     "supplyDropped": "补给箱已投下！寻找金色光芒！",
-    "perkAcquired": "{0} 已获得！"
+    "perkAcquired": "{0} 已获得！",
+    "saveCopied": "存档已复制到剪贴板",
+    "saveDownloaded": "存档文件已下载",
+    "saveImported": "存档导入成功，正在重新加载…",
+    "saveInvalid": "存档无效或已损坏",
+    "runResumed": "已恢复第 {0} 波进度",
+    "dataCleared": "已清除数据"
   },
   "shop": {
     "waveCleared": "第 {0} 波已清除",
@@ -228,6 +236,13 @@
   "pause": {
     "title": "暂停",
     "resume": "继续游戏",
-    "language": "选择语言"
+    "language": "选择语言",
+    "exportData": "导出数据",
+    "importData": "导入数据",
+    "clearData": "清除数据",
+    "clearConfirm": "确定要清除所有数据吗？设置、成就和游戏进度都会被删除，且无法恢复。",
+    "undo": "撤销",
+    "cancel": "取消",
+    "ok": "确定"
   }
 }

@@ -6,6 +6,8 @@
     "name": "NEON SIEGE",
     "tagline": "Hold the line. Outlast the swarm.",
     "play": "Click to Play",
+    "newGame": "▶ NEW GAME",
+    "continue": "▶ CONTINUE FROM WAVE {0}",
     "difficulty": {
       "normal": "Normal",
       "hard": "Hard",
@@ -149,7 +151,13 @@
     "pickedArmor": "+50 Armor",
     "supplyCrate": "Supply crate: +2 Medkits, +30 Ammo, +2 Grenades!",
     "supplyDropped": "Supply crate dropped! Look for the golden glow!",
-    "perkAcquired": "{0} acquired!"
+    "perkAcquired": "{0} acquired!",
+    "saveCopied": "Save copied to clipboard",
+    "saveDownloaded": "Save file downloaded",
+    "saveImported": "Save imported, reloading…",
+    "saveInvalid": "Invalid or corrupted save",
+    "runResumed": "Resumed at wave {0}",
+    "dataCleared": "Data cleared"
   },
   "shop": {
     "waveCleared": "WAVE {0} CLEARED",
@@ -228,6 +236,13 @@
   "pause": {
     "title": "PAUSED",
     "resume": "RESUME",
-    "language": "Language"
+    "language": "Language",
+    "exportData": "Export Data",
+    "importData": "Import Data",
+    "clearData": "Clear Data",
+    "clearConfirm": "Clear all data? Settings, achievements and game progress will be erased. This cannot be undone.",
+    "undo": "Undo",
+    "cancel": "Cancel",
+    "ok": "Confirm"
   }
 }

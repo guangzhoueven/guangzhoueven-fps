@@ -1,4 +1,4 @@
-const { app, BrowserWindow, protocol, net, shell } = require('electron');
+const { app, BrowserWindow, protocol, net, shell, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { pathToFileURL } = require('url');
@@ -80,6 +80,13 @@ app.whenReady().then(() => {
     } catch {
       return new Response('Not Found', { status: 404 });
     }
+  });
+
+  // Save-file dialog when the game exports a save (download link)
+  session.defaultSession.on('will-download', (event, item) => {
+    item.setSaveDialogOptions({
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
   });
 
   createWindow();

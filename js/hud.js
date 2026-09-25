@@ -10,6 +10,17 @@ function toast(msg, variant='info'){
   const t = document.createElement('div'); t.className = 'toast ' + variant; t.textContent = msg;
   c.appendChild(t); setTimeout(()=>t.remove(), 3200);
 }
+// Toast with an action button (longer-lived)
+function toastAction(msg, btnLabel, cb, variant='info'){
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div'); t.className = 'toast toast-action ' + variant;
+  const s = document.createElement('span'); s.textContent = msg;
+  const b = document.createElement('button'); b.className = 'toast-act'; b.textContent = btnLabel;
+  b.addEventListener('click', ()=>{ t.remove(); try{ cb(); }catch(e){} });
+  t.appendChild(s); t.appendChild(b);
+  c.appendChild(t); setTimeout(()=>t.remove(), 10000);
+  return t;
+}
 // Minimap
 const mmCanvas = document.getElementById('minimap');
 const mmCtx = mmCanvas ? mmCanvas.getContext('2d') : null;

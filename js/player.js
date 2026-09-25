@@ -121,5 +121,5 @@ function showDamageDirection(fromPos){
   setTimeout(()=>{ el.innerHTML = ''; }, 600);
 }
 
-function triggerGameOver(){ state.gameOver = true; document.exitPointerLock(); showGameOver(); }
+function triggerGameOver(){ state.gameOver = true; if(window.SaveGame) SaveGame.clearRun(); document.exitPointerLock(); showGameOver(); }
 function addShake(mag){ shakeMag = Math.max(shakeMag, mag); }
