@@ -125,7 +125,7 @@ class Enemy {
     }
     const speed = this.def.speed * diffCfg.enemySpeedMult;
     if(this.state==='PURSUE'||this.state==='LOST'||this.state==='ALERT'){
-      // --- A* pathing: head for the player's real position when LOS is broken or we're wedged ---
+      // --- B* pathing: head for the player's real position when LOS is broken or we're wedged ---
       const oldX=this.mesh.position.x, oldZ=this.mesh.position.z;
       let usedPath = false;
       const stuckNow = (this._stuckTimer||0) > 0.35;
@@ -181,7 +181,7 @@ class Enemy {
     if(this.def.kind==='boss'){ this.mesh.rotation.x += dt*0.5; this.mesh.rotation.z += dt*0.3; }
     this.updateHpBar();
   }
-  // A* path to a world position; null path → caller falls back to direct steering
+  // B* path to a world position; null path → caller falls back to direct steering
   computePathTo(tx, tz){
     this.path = null; this._pathFailed = false;
     if(!navReady || !this.navGrid) return;
@@ -189,7 +189,7 @@ class Enemy {
     const sIdx = findNearestOpenCell(grid, navIdxOf(this.mesh.position.x, this.mesh.position.z));
     const gIdx = findNearestOpenCell(grid, navIdxOf(tx, tz));
     if(sIdx < 0 || gIdx < 0 || sIdx === gIdx) return;
-    const p = astar(grid, sIdx, gIdx, 2500);
+    const p = bstar(grid, sIdx, gIdx, 2500);
     if(p){ this.path = p; this.pathIndex = 0; }
     else this._pathFailed = true; // don't retry every frame when no route exists
   }
@@ -221,14 +221,14 @@ class Enemy {
     return _losRC.intersectObjects(wallMeshes, false).length > 0;
   }
   takeDamage(dmg, headshot){
-    if(!this.alive) return;
+    if(!this.alive || this.dying) return;
     this.hp -= dmg;
     const mat = this.mesh.material;
     if(mat.emissive && !this._flashing){ this._flashing = true; this._flashTimer = 0.06; mat.emissive.setHex(0xffffff); }
     if(this.hp <= 0) this.die(headshot);
   }
   die(headshot){
-    if(!this.alive) return;
+    if(!this.alive || this.dying) return; // dying — never re-enter (tank explosion used to recurse infinitely)
     // Start ragdoll death animation instead of immediate removal
     this.dying = true; this.dyingTimer = 0.5; this.dyingStartY = this.mesh.position.y; this.dyingRotSpeed = {x:(Math.random()-0.5)*4, z:(Math.random()-0.5)*4};
     state.enemiesAlive = Math.max(0, state.enemiesAlive - 1); state.stats.kills++;
@@ -265,7 +265,7 @@ class Enemy {
       const flashLight = new THREE.PointLight(0xff8800,20,25,1.5); flashLight.position.copy(pos); scene.add(flashLight);
       setTimeout(()=>{ if(flashLight.parent) scene.remove(flashLight); }, 400);
       const radius = 4.5;
-      for(const en of enemies){ if(en.alive && pos.distanceTo(en.mesh.position) < radius){ en.takeDamage(80 * damageMult, false); } }
+      for(const en of enemies){ if(en !== this && en.alive && !en.dying && pos.distanceTo(en.mesh.position) < radius){ en.takeDamage(80 * damageMult, false); } }
       for(const other of explosiveBarrels){ if(!other.exploded && pos.distanceTo(other.pos) < radius){ setTimeout(()=>detonateBarrel(other), 80); } }
       if(pos.distanceTo(camera.position) < 3.5){ takeDamage(40, pos); }
       audio.explosion(); addShake(1.0);

@@ -172,3 +172,134 @@ function astar(grid, sIdx, gIdx, maxExpand){
   if(rev.length % 2 === 0){ navWorldOf(rev[rev.length - 1], _asWp); path.push({x:_asWp.x, z:_asWp.z}); }
   return path.length ? path : null;
 }
+
+// ============================================================================
+// B* (Branch Star) — greedy goalward walk + branch-around-obstacle
+// Explores far fewer cells than A*; paths are good but not always optimal.
+// Returns [{x,z}, ...] start->goal waypoints (same shape as astar), or null.
+// Modes: free = walk straight at the goal; on a wall -> branch two "crawlers"
+// perpendicular that follow the wall until the goalward way reopens.
+// ============================================================================
+const _bsQCell = new Int32Array(NAV_N + 16);
+const _bsQMeta = new Int32Array(NAV_N + 16);   // mode | wallside<<1 | dirIdx<<2
+const _bsParent = new Int32Array(NAV_N);
+const _bsVisit = new Int32Array(NAV_N);
+let _bsGen = 0;
+const _bsWp = {x:0, z:0};
+function bstar(grid, sIdx, gIdx, maxExpand){
+  if(sIdx < 0 || gIdx < 0 || sIdx === gIdx) return null;
+  const blocked = grid.blocked;
+  const gen = ++_bsGen;
+  const gGX = gIdx % NAV_W, gGZ = (gIdx / NAV_W) | 0;
+  let head = 0, tail = 0, steps = 0, found = -1;
+
+  const stepOK = (c, dx, dz) => {
+    if(dx === 0 && dz === 0) return false;
+    const cx = c % NAV_W, cz = (c / NAV_W) | 0;
+    const nx = cx + dx, nz = cz + dz;
+    if(nx < 0 || nz < 0 || nx >= NAV_W || nz >= NAV_H) return false;
+    const ni = nz * NAV_W + nx;
+    if(blocked[ni]) return false;
+    if(dx !== 0 && dz !== 0 && (blocked[cz * NAV_W + nx] || blocked[nz * NAV_W + cx])) return false;
+    return true;
+  };
+  const enqueue = (ni, from, dirIdx, ws, mode) => {
+    if(_bsVisit[ni] === gen) return;
+    if(tail >= _bsQCell.length) return;
+    _bsVisit[ni] = gen; _bsParent[ni] = from;
+    _bsQCell[tail] = ni;
+    _bsQMeta[tail] = mode | ((ws > 0 ? 1 : 0) << 1) | (dirIdx << 2);
+    tail++;
+  };
+  const latBlocked = (x, z) => (x < 0 || z < 0 || x >= NAV_W || z >= NAV_H) ? true : blocked[z * NAV_W + x];
+
+  _bsVisit[sIdx] = gen; _bsParent[sIdx] = -1;
+  _bsQCell[0] = sIdx; _bsQMeta[0] = 0; tail = 1;
+
+  while(head < tail && found < 0){
+    if(steps >= maxExpand) return null;
+    let cell = _bsQCell[head];
+    const meta = _bsQMeta[head]; head++;
+    let mode = meta & 1;
+    let ws = (meta & 2) ? 1 : -1;
+    const dirIdx = meta >> 2;
+
+    runLoop: for(;;){
+      if(steps >= maxExpand) return null;
+      if(cell === gIdx){ found = cell; break; }
+      const cx = cell % NAV_W, cz = (cell / NAV_W) | 0;
+      const sdx = Math.sign(gGX - cx), sdz = Math.sign(gGZ - cz);
+
+      // --- goalward step: diagonal first, then the two axis options ---
+      let ni = -1;
+      if(sdx !== 0 && sdz !== 0 && stepOK(cell, sdx, sdz)) ni = (cz + sdz) * NAV_W + (cx + sdx);
+      else if(sdx !== 0 && stepOK(cell, sdx, 0)) ni = cz * NAV_W + (cx + sdx);
+      else if(sdz !== 0 && stepOK(cell, 0, sdz)) ni = (cz + sdz) * NAV_W + cx;
+      if(ni >= 0){
+        if(ni === gIdx){ _bsParent[ni] = cell; found = ni; break; }
+        if(_bsVisit[ni] !== gen){
+          steps++;
+          _bsVisit[ni] = gen; _bsParent[ni] = cell;
+          cell = ni; mode = 0;               // crawl escaping -> converts to free walk
+          continue;
+        }
+        if(mode === 0) break;                // free run merged into explored area -> done
+        // crawl: goalward way already explored -> fall through and keep crawling
+      }
+
+      if(mode === 0){
+        // --- wall ahead -> branch two crawlers perpendicular to goalward ---
+        const dRefX = Math.abs(gGX - cx) >= Math.abs(gGZ - cz) ? sdx : 0;
+        const dRefZ = dRefX === 0 ? sdz : 0;
+        for(let sb = 1; sb >= -1; sb -= 2){
+          const vx = sb === 1 ? -dRefZ : dRefZ;
+          const vz = sb === 1 ? dRefX : -dRefX;
+          if(!stepOK(cell, vx, vz)) continue;
+          const ni2 = (cz + vz) * NAV_W + (cx + vx);
+          if(ni2 === gIdx){ _bsParent[ni2] = cell; found = ni2; break runLoop; }
+          enqueue(ni2, cell, ((vx + 1) << 2) | (vz + 1), -sb, 1);
+        }
+        break;                                 // run ends after branching
+      }
+
+      // --- crawl along the wall: forward, forward+away diagonal, away ---
+      const dX = ((dirIdx >> 2) - 1), dZ = ((dirIdx & 3) - 1);
+      // away = rot90(dir, -ws);  rot90(d,s): s=+1 -> (-dz,dx), s=-1 -> (dz,-dx)
+      const aX = ws === -1 ? -dZ : dZ;
+      const aZ = ws === -1 ? dX : -dX;
+      let mX = dX + aX, mZ = dZ + aZ;         // normalize the diagonal combination
+      if(Math.max(Math.abs(mX), Math.abs(mZ)) > 1){ mX = mX > 0 ? 1 : (mX < 0 ? -1 : 0); mZ = mZ > 0 ? 1 : (mZ < 0 ? -1 : 0); }
+      let ni2 = -1, cX = 0, cZ = 0;
+      const candTake = (dx2, dz2) => {
+        if(!stepOK(cell, dx2, dz2)) return false;
+        const t = (cz + dz2) * NAV_W + (cx + dx2);
+        if(t !== gIdx && _bsVisit[t] === gen) return false; // already explored -> try next option
+        ni2 = t; cX = dx2; cZ = dz2;
+        return true;
+      };
+      if(!candTake(dX, dZ) && !candTake(mX, mZ)) candTake(aX, aZ);
+      if(ni2 < 0) break;                       // pocket -> this branch dies
+      steps++;
+      if(ni2 === gIdx){ _bsParent[ni2] = cell; found = ni2; break; }
+      // refresh wall side at the new cell: keep old side if wall still there, else flip
+      const nx2 = ni2 % NAV_W, nz2 = (ni2 / NAV_W) | 0;
+      let nws = ws;
+      const onOld = ws === 1 ? latBlocked(nx2 - cZ, nz2 + cX) : latBlocked(nx2 + cZ, nz2 - cX);
+      if(!onOld){
+        const onOpp = ws === 1 ? latBlocked(nx2 + cZ, nz2 - cX) : latBlocked(nx2 - cZ, nz2 + cX);
+        if(onOpp) nws = -ws;
+      }
+      enqueue(ni2, cell, ((cX + 1) << 2) | (cZ + 1), nws, 1);
+      break;                                   // one crawl step per queue entry
+    }
+  }
+  if(found < 0) return astar(grid, sIdx, gIdx, maxExpand); // greedy walk wedge -> A* guarantees completeness
+  const rev = [];
+  let cur = found;
+  while(cur !== -1 && rev.length < 4000){ rev.push(cur); cur = _bsParent[cur]; }
+  rev.reverse(); // start -> goal
+  const path = [];
+  for(let i = 2; i < rev.length; i += 2){ navWorldOf(rev[i], _bsWp); path.push({x:_bsWp.x, z:_bsWp.z}); }
+  if(rev.length % 2 === 0){ navWorldOf(rev[rev.length - 1], _bsWp); path.push({x:_bsWp.x, z:_bsWp.z}); }
+  return path.length ? path : null;
+}
