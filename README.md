@@ -1,7 +1,10 @@
 # 霓虹围城
 
 <p align="center">
-  <a href="/README_en.md">English</a> | <a href="/README.md">中文</a><br>
+  <a href="/README_en.md">English</a> | <a href="/README.md">中文</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/guangzhoueven/guangzhoueven-fps/actions/workflows/release.yml">
     <img alt="Build & Release" src="https://github.com/guangzhoueven/guangzhoueven-fps/actions/workflows/release.yml/badge.svg" />
   </a>
@@ -10,7 +13,6 @@
   <img alt="Electron" src="https://img.shields.io/badge/Electron-33-47848F?logo=electron&logoColor=white" />
   <img alt="Website" src="https://img.shields.io/badge/website-fps.gzeven.cc.cd-blue" />
 </p>
-
 <p align="center">
   <img alt="GitHub stars" src="https://img.shields.io/github/stars/guangzhoueven/guangzhoueven-fps?style=social" />
   <img alt="GitHub forks" src="https://img.shields.io/github/forks/guangzhoueven/guangzhoueven-fps?style=social" />
@@ -26,10 +28,10 @@
   </picture>
   </a>
 </p>
-
 <p align="center">
-  <a href="https://fps.gzeven.cc.cd"><b>🎮 立即游玩 — fps.gzeven.cc.cd</b></a>
+  <a href="https://fps.gzeven.cc.cd"><b>立即游玩 — fps.gzeven.cc.cd</b></a>
 </p>
+
 
 ---
 
