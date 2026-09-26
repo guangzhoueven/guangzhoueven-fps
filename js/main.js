@@ -71,7 +71,10 @@ addEventListener('keydown', e=>{
 let skyDayPhase = Math.PI * 0.3;
 const _skyColor = new THREE.Color();
 function updateDynamicSky(dt){
-  skyDayPhase += dt * 0.012;
+  // Menu keeps the sky locked to the initial daytime look (start page always looks
+  // the same); pause freezes it in place; only play advances the day cycle.
+  if(phase === 'menu') skyDayPhase = Math.PI * 0.3;
+  else if(phase !== 'paused') skyDayPhase += dt * 0.012;
   const t = skyDayPhase;
   const cycle = Math.sin(t);
   const r = 0.15 + Math.max(0, cycle) * 0.55 + 0.2;
