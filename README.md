@@ -3,7 +3,6 @@
 <p align="center">
   <a href="/README_en.md">English</a> | <a href="/README.md">中文</a>
 </p>
-
 <p align="center">
   <a href="https://github.com/guangzhoueven/guangzhoueven-fps/actions/workflows/release.yml">
     <img alt="Build & Release" src="https://github.com/guangzhoueven/guangzhoueven-fps/actions/workflows/release.yml/badge.svg" />
@@ -11,13 +10,13 @@
   <img alt="Language" src="https://img.shields.io/badge/language-JavaScript-F7DF1E?logo=javascript&logoColor=black" />
   <img alt="Three.js" src="https://img.shields.io/badge/Three.js-r160-black?logo=threedotjs&logoColor=white" />
   <img alt="Electron" src="https://img.shields.io/badge/Electron-33-47848F?logo=electron&logoColor=white" />
-  <img alt="Website" src="https://img.shields.io/badge/website-fps.gzeven.cc.cd-blue" />
 </p>
 <p align="center">
   <img alt="GitHub stars" src="https://img.shields.io/github/stars/guangzhoueven/guangzhoueven-fps?style=social" />
   <img alt="GitHub forks" src="https://img.shields.io/github/forks/guangzhoueven/guangzhoueven-fps?style=social" />
   <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/guangzhoueven/guangzhoueven-fps?style=social" />
 </p>
+
 
 <p align="center">
   <a href="https://www.star-history.com/?repos=guangzhoueven%2Fguangzhoueven-fps&type=date&legend=top-left">
@@ -29,7 +28,7 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://fps.gzeven.cc.cd"><b>立即游玩 — fps.gzeven.cc.cd</b></a>
+  <a href="http://guangzhoueven.github.io/guangzhoueven-fps"><b>立即游玩</b></a>
 </p>
 
 
