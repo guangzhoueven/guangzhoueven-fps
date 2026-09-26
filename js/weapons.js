@@ -201,7 +201,7 @@ function doReload(){
 function updateWeaponAnim(dt){
   if(weaponRecoil > 0) weaponRecoil = Math.max(0, weaponRecoil - dt*8);
   const recoilZ = weaponRecoil * 0.12, recoilRot = weaponRecoil * 0.3;
-  if(weaponReloadAnim > 0) weaponReloadAnim = Math.max(0, weaponReloadAnim - dt*1.5);
+  if(weaponReloadAnim > 0) weaponReloadAnim = Math.max(0, weaponReloadAnim - dt / Math.max(0.05, reloadDuration / 1000)); // dip lasts exactly as long as the real reload
   const reloadDip = Math.sin(weaponReloadAnim * Math.PI) * 0.25;
   if(weaponSwapAnim > 0) weaponSwapAnim = Math.max(0, weaponSwapAnim - dt*3.5);
   const swapDip = weaponSwapAnim * 0.35, swapRot = weaponSwapAnim * 0.8;

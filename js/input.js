@@ -100,12 +100,13 @@ function toggleWeaponStatsPanel(){
       html += `<span style="font-size:14px;color:#fff;font-weight:700">${w.icon} ${I18n.t('weapon.'+w.id)}</span>`;
       html += `<span style="font-size:11px;color:#fbbf24">${ammo.mag}/${ammo.reserve}</span></div>`;
       html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-top:5px;">`;
-html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.damage')}</span><br><span style="color:#f87171;font-size:12px">${w.damage}</span></div>`;
+html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.damage')}</span><br><span style="color:#f87171;font-size:12px">${Math.round(w.damage * damageMult)}</span></div>`;
       html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.fireRate')}</span><br><span style="color:#a5b4fc;font-size:12px">${(1/w.fireRate).toFixed(1)}/s</span></div>`;
       html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.mag')}</span><br><span style="color:#86efac;font-size:12px">${w.magSize}</span></div>`;
       html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.range')}</span><br><span style="color:#67e8f9;font-size:12px">${w.range}m</span></div>`;
       html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.type')}</span><br><span style="color:#c4b5fd;font-size:12px">${w.auto?I18n.t('ammo.fullAuto'):I18n.t('ammo.semiAuto')}</span></div>`;
-      html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.reload')}</span><br><span style="color:#fcd34d;font-size:12px">${w.reloadTime.toFixed(1)}s</span></div>`;
+      const effReload = w.reloadTime / (1 + (reloadSpeedMult - 1) * 0.5);
+      html += `<div><span style="color:rgba(255,255,255,.4);font-size:10px">${I18n.t('weaponStats.reload')}</span><br><span style="color:#fcd34d;font-size:12px">${effReload.toFixed(2)}s</span></div>`;
       html += `</div></div>`;
     }
     content.innerHTML = html;
